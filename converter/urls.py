@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import upload_file
+from . import views
 
 urlpatterns = [
-    path("", upload_file, name="upload"),
+    path("", views.dashboard, name="dashboard"),
+    path("convert/", views.convert_file, name="convert"),
+    path("download/<str:token>/", views.download_file, name="download"),
 ]
