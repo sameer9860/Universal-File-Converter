@@ -703,6 +703,7 @@
         const convertAnother = document.getElementById('convert-another');
 
         let selectedFile = null;
+        let downloadTimer = null;
 
         dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
         dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
@@ -808,7 +809,6 @@
             metaFormat.textContent = data.label;
             metaOutput.textContent = data.format_name;
             metaSize.textContent = data.size_kb + ' KB';
-            resultSub.textContent = `"${data.original_name}" is ready to download.`;
 
             const url = `/download/${encodeURIComponent(data.token)}/`;
             downloadLink.href = url;
@@ -817,7 +817,20 @@
             resultCard.style.display = 'block';
             resetConvertBtn();
 
-            setTimeout(() => { triggerDownload(url, data.original_name); }, 800);
+            let timeLeft = 5;
+            resultSub.textContent = `"${data.original_name}" ready. Auto-downloading in ${timeLeft}s...`;
+
+            if (downloadTimer) clearInterval(downloadTimer);
+            downloadTimer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft > 0) {
+                    resultSub.textContent = `"${data.original_name}" ready. Auto-downloading in ${timeLeft}s...`;
+                } else {
+                    clearInterval(downloadTimer);
+                    resultSub.textContent = `"${data.original_name}" has been downloaded.`;
+                    triggerDownload(url, data.original_name);
+                }
+            }, 1000);
         }
 
         function triggerDownload(url, filename) {
@@ -830,6 +843,7 @@
         }
 
         convertAnother.addEventListener('click', () => {
+            if (downloadTimer) clearInterval(downloadTimer);
             selectedFile = null;
             fileInput.value = '';
             selectedName.style.display = 'none';
