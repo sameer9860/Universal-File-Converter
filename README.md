@@ -87,6 +87,15 @@ sudo apt install ffmpeg
 6. **Open your browser**
    Navigate to `http://127.0.0.1:8000` to start converting!
 
+### Docker Deployment (Recommended)
+
+You can easily deploy the application using Docker and Docker Compose. This ensures all system dependencies (LibreOffice, FFmpeg, etc.) are correctly set up.
+
+1. **Setup environment**: `cp .env.example .env` and update the values.
+2. **Launch**: `docker-compose up --build -d`
+
+The app will be available at `http://localhost:8000`.
+
 ---
 
 ## 💻 Usage
