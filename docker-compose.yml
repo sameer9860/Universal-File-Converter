@@ -10,7 +10,7 @@ services:
     volumes:
       - media_volume:/app/media
       - static_volume:/app/staticfiles
-    restart: always
+    restart: unless-stopped
 
 volumes:
   media_volume:
