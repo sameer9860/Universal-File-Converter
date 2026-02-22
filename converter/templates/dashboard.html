@@ -1,0 +1,727 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LibreOffice → Office Converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0d0f1a;
+            --surface: #141828;
+            --card: #1a1f35;
+            --border: #2a3050;
+            --accent: #6c63ff;
+            --accent2: #a78bfa;
+            --success: #10d9a0;
+            --danger: #f87171;
+            --text: #e2e8f0;
+            --muted: #8892b0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ── Header ── */
+        header {
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        header .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        header span {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        /* ── Main ── */
+        main {
+            width: 100%;
+            max-width: 860px;
+            padding: 48px 20px 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 30%, var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        /* ── Format badges ── */
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: border-color .2s, transform .2s;
+        }
+
+        .badge:hover {
+            border-color: var(--accent2);
+            transform: translateY(-2px);
+        }
+
+        .badge .from {
+            color: var(--muted);
+        }
+
+        .badge .arrow {
+            color: var(--accent);
+            font-size: 1rem;
+        }
+
+        .badge .to {
+            color: var(--success);
+        }
+
+        /* ── Drop zone ── */
+        .dropzone {
+            position: relative;
+            border: 2px dashed var(--border);
+            border-radius: 20px;
+            background: var(--card);
+            padding: 52px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color .25s, background .25s;
+        }
+
+        .dropzone.drag-over {
+            border-color: var(--accent);
+            background: rgba(108, 99, 255, .08);
+        }
+
+        .dropzone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .dropzone .dz-icon {
+            font-size: 3.4rem;
+            margin-bottom: 12px;
+            transition: transform .3s;
+        }
+
+        .dropzone:hover .dz-icon {
+            transform: translateY(-4px);
+        }
+
+        .dropzone h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        .dropzone p {
+            color: var(--muted);
+            font-size: 0.88rem;
+            margin-top: 6px;
+        }
+
+        .dropzone .hint {
+            display: inline-block;
+            margin-top: 14px;
+            font-size: 0.78rem;
+            color: var(--muted);
+            background: rgba(255, 255, 255, .05);
+            border-radius: 8px;
+            padding: 5px 14px;
+        }
+
+        #selected-name {
+            margin-top: 14px;
+            font-size: 0.88rem;
+            color: var(--accent2);
+            font-weight: 500;
+            display: none;
+        }
+
+        /* ── Convert button ── */
+        #convert-btn {
+            display: none;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: opacity .2s, transform .15s;
+        }
+
+        #convert-btn:hover:not(:disabled) {
+            opacity: .9;
+            transform: translateY(-1px);
+        }
+
+        #convert-btn:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+        /* ── Progress bar ── */
+        #progress-wrap {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+
+        .progress-track {
+            height: 8px;
+            background: var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            border-radius: 999px;
+            transition: width .4s ease;
+        }
+
+        /* ── Result card ── */
+        #result-card {
+            display: none;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px 30px;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp .4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #result-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--success), var(--accent2));
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .result-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(16, 217, 160, .12);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+
+        .result-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .result-sub {
+            font-size: 0.83rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .result-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .meta-pill {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .meta-pill span {
+            color: var(--muted);
+        }
+
+        .meta-pill strong {
+            color: var(--text);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 28px;
+            background: linear-gradient(135deg, var(--success), #0ab888);
+            color: #0d0f1a;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity .2s, transform .15s;
+        }
+
+        .download-btn:hover {
+            opacity: .9;
+            transform: translateY(-1px);
+        }
+
+        .convert-another-btn {
+            margin-left: 12px;
+            padding: 13px 22px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--muted);
+            font-family: inherit;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: border-color .2s, color .2s;
+        }
+
+        .convert-another-btn:hover {
+            border-color: var(--accent2);
+            color: var(--accent2);
+        }
+
+        /* ── Error ── */
+        #error-box {
+            display: none;
+            background: rgba(248, 113, 113, .08);
+            border: 1px solid rgba(248, 113, 113, .3);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: var(--danger);
+            font-size: 0.88rem;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #error-box.visible {
+            display: flex;
+        }
+
+        /* ── Steps ── */
+        .steps {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            max-width: 160px;
+            position: relative;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: var(--border);
+        }
+
+        .step-bubble {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--card);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step p {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo-icon">⚡</div>
+        <h1>LibreOffice → Office Converter</h1>
+        <span>Free · Secure · Fast</span>
+    </header>
+
+    <main>
+
+        <!-- Hero -->
+        <div class="hero">
+            <h2>Convert LibreOffice Files<br>to Microsoft Office</h2>
+            <p>Upload an ODT, ODS, or ODP file and get back a DOCX, XLSX, or PPTX instantly.</p>
+        </div>
+
+        <!-- Format badges -->
+        <div class="badges">
+            <div class="badge"><span class="from">ODT</span><span class="arrow">→</span><span class="to">DOCX</span>
+            </div>
+            <div class="badge"><span class="from">ODS</span><span class="arrow">→</span><span class="to">XLSX</span>
+            </div>
+            <div class="badge"><span class="from">ODP</span><span class="arrow">→</span><span class="to">PPTX</span>
+            </div>
+        </div>
+
+        <!-- How it works -->
+        <div class="steps">
+            <div class="step">
+                <div class="step-bubble">📂</div>
+                <p>Upload your<br>LibreOffice file</p>
+            </div>
+            <div class="step">
+                <div class="step-bubble">⚙️</div>
+                <p>We convert it<br>instantly</p>
+            </div>
+            <div class="step">
+                <div class="step-bubble">📥</div>
+                <p>Download the<br>Office file</p>
+            </div>
+        </div>
+
+        <!-- Drop zone -->
+        <div class="dropzone" id="dropzone">
+            <input type="file" id="file-input" name="file" accept=".odt,.ods,.odp" />
+            <div class="dz-icon">📄</div>
+            <h3>Drop your file here, or click to browse</h3>
+            <p>Supports ODT, ODS, ODP files</p>
+            <span class="hint">Max file size: 10 MB</span>
+            <div id="selected-name"></div>
+        </div>
+
+        <!-- Convert button -->
+        <button id="convert-btn">⚡ Convert Now</button>
+
+        <!-- Progress -->
+        <div id="progress-wrap">
+            <div class="progress-label">
+                <span id="progress-label-text">Converting…</span>
+                <span id="progress-pct">0%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div id="error-box">⚠️ <span id="error-text"></span></div>
+
+        <!-- Result card -->
+        <div id="result-card">
+            <div class="result-header">
+                <div class="result-icon">✅</div>
+                <div>
+                    <div class="result-title">Conversion Complete!</div>
+                    <div class="result-sub" id="result-sub">Your file is ready to download.</div>
+                </div>
+            </div>
+
+            <div class="result-meta">
+                <div class="meta-pill"><span>Format </span><strong id="meta-format">—</strong></div>
+                <div class="meta-pill"><span>Output </span><strong id="meta-output">—</strong></div>
+                <div class="meta-pill"><span>Size </span><strong id="meta-size">—</strong></div>
+            </div>
+
+            <a id="download-link" class="download-btn" href="#">
+                📥 Download File
+            </a>
+            <button class="convert-another-btn" id="convert-another">↩ Convert Another</button>
+        </div>
+
+    </main>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const selectedName = document.getElementById('selected-name');
+        const convertBtn = document.getElementById('convert-btn');
+        const progressWrap = document.getElementById('progress-wrap');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPct = document.getElementById('progress-pct');
+        const progressLabel = document.getElementById('progress-label-text');
+        const errorBox = document.getElementById('error-box');
+        const errorText = document.getElementById('error-text');
+        const resultCard = document.getElementById('result-card');
+        const resultSub = document.getElementById('result-sub');
+        const metaFormat = document.getElementById('meta-format');
+        const metaOutput = document.getElementById('meta-output');
+        const metaSize = document.getElementById('meta-size');
+        const downloadLink = document.getElementById('download-link');
+        const convertAnother = document.getElementById('convert-another');
+
+        let selectedFile = null;
+
+        // ── Drag & Drop ──────────────────────────────────────────
+        dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+        dropzone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropzone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length) handleFile(files[0]);
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) handleFile(fileInput.files[0]);
+        });
+
+        function handleFile(file) {
+            const allowed = ['.odt', '.ods', '.odp'];
+            const ext = '.' + file.name.split('.').pop().toLowerCase();
+            if (!allowed.includes(ext)) {
+                showError(`"${file.name}" is not supported. Please upload an ODT, ODS, or ODP file.`);
+                return;
+            }
+            selectedFile = file;
+            selectedName.textContent = '📎 ' + file.name;
+            selectedName.style.display = 'block';
+            convertBtn.style.display = 'block';
+            hideError();
+            resultCard.style.display = 'none';
+        }
+
+        // ── Convert ───────────────────────────────────────────────
+        convertBtn.addEventListener('click', () => {
+            if (!selectedFile) return;
+            startConversion();
+        });
+
+        function startConversion() {
+            // UI
+            convertBtn.disabled = true;
+            progressWrap.style.display = 'flex';
+            hideError();
+            resultCard.style.display = 'none';
+
+            // Animate progress indeterminate-style
+            let fake = 0;
+            const ticker = setInterval(() => {
+                fake = Math.min(fake + Math.random() * 8, 88);
+                setProgress(fake);
+            }, 300);
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+
+            fetch('/convert/', {
+                method: 'POST',
+                body: formData,
+            })
+                .then(async res => {
+                    const data = await res.json();
+                    clearInterval(ticker);
+                    setProgress(100, 'Done!');
+
+                    await sleep(400);
+
+                    if (!res.ok || !data.success) {
+                        showError(data.error || 'Something went wrong. Please try again.');
+                        resetConvertBtn();
+                        progressWrap.style.display = 'none';
+                        return;
+                    }
+
+                    showResult(data);
+                })
+                .catch(() => {
+                    clearInterval(ticker);
+                    showError('Network error. Please check your connection and try again.');
+                    resetConvertBtn();
+                    progressWrap.style.display = 'none';
+                });
+        }
+
+        function showResult(data) {
+            progressWrap.style.display = 'none';
+            metaFormat.textContent = data.label;
+            metaOutput.textContent = data.format_name;
+            metaSize.textContent = data.size_kb + ' KB';
+            resultSub.textContent = `"${data.original_name}" is ready to download.`;
+
+            const url = `/download/${encodeURIComponent(data.token)}/`;
+            downloadLink.href = url;
+            downloadLink.download = data.original_name;
+
+            resultCard.style.display = 'block';
+            resetConvertBtn();
+
+            // Auto-download after a short delay
+            setTimeout(() => {
+                triggerDownload(url, data.original_name);
+            }, 800);
+        }
+
+        function triggerDownload(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // ── Convert Another ───────────────────────────────────────
+        convertAnother.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            selectedName.style.display = 'none';
+            convertBtn.style.display = 'none';
+            resultCard.style.display = 'none';
+            hideError();
+        });
+
+        // ── Helpers ───────────────────────────────────────────────
+        function setProgress(pct, label) {
+            progressBar.style.width = pct + '%';
+            progressPct.textContent = Math.round(pct) + '%';
+            if (label) progressLabel.textContent = label;
+        }
+
+        function showError(msg) {
+            errorText.textContent = msg;
+            errorBox.classList.add('visible');
+        }
+
+        function hideError() {
+            errorBox.classList.remove('visible');
+        }
+
+        function resetConvertBtn() {
+            convertBtn.disabled = false;
+            progressWrap.style.display = 'none';
+            setProgress(0);
+            progressLabel.textContent = 'Converting…';
+        }
+
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        function getCookie(name) {
+            const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+            return match ? decodeURIComponent(match[1]) : '';
+        }
+    </script>
+
+</body>
+
+</html>
