@@ -57,9 +57,9 @@ def upload_file(request):
                 filename=output_filename
             )
 
-            # ✅ Cleanup after response
-            os.remove(filepath)
-            os.remove(output_file_path)
+            # # ✅ Cleanup after response
+            # os.remove(filepath)
+            # os.remove(output_file_path)
 
             return response
 
