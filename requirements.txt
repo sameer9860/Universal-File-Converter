@@ -85,3 +85,7 @@ wheel==0.42.0
 wsproto==1.2.0
 xdg==5
 xkit==0.0.0
+# Production
+gunicorn==21.2.0
+whitenoise==6.6.0
+python-dotenv==1.0.1
