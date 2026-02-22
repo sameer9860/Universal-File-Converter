@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import  os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -66,6 +67,14 @@ TEMPLATES = [
         },
     },
 ]
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
+
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB limit
 
 WSGI_APPLICATION = 'FileConverter.wsgi.application'
 
