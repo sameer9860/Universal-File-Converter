@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LibreOffice → Office Converter</title>
+    <title>Universal File Converter</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet" />
     <style>
@@ -104,43 +104,85 @@
             font-size: 1rem;
         }
 
-        /* ── Format badges ── */
-        .badges {
+        /* ── Tabs ── */
+        .tabs {
             display: flex;
             justify-content: center;
-            gap: 12px;
+            gap: 8px;
             flex-wrap: wrap;
+            margin-bottom: 10px;
         }
 
-        .badge {
+        .tab {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 10px 20px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: var(--card);
+            color: var(--text);
+        }
+
+        .tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        /* ── Format Selectors ── */
+        .format-selectors {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 16px;
             background: var(--card);
+            padding: 16px;
+            border-radius: 16px;
             border: 1px solid var(--border);
-            border-radius: 999px;
-            padding: 8px 18px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: border-color .2s, transform .2s;
         }
 
-        .badge:hover {
-            border-color: var(--accent2);
-            transform: translateY(-2px);
+        .select-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
         }
 
-        .badge .from {
+        .select-wrap label {
+            font-size: 0.8rem;
             color: var(--muted);
+            font-weight: 500;
         }
 
-        .badge .arrow {
-            color: var(--accent);
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-family: inherit;
             font-size: 1rem;
+            outline: none;
         }
 
-        .badge .to {
-            color: var(--success);
+        select:focus {
+            border-color: var(--accent);
+        }
+
+        .arrow-icon {
+            color: var(--accent);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 8px;
         }
 
         /* ── Drop zone ── */
@@ -186,16 +228,6 @@
             color: var(--muted);
             font-size: 0.88rem;
             margin-top: 6px;
-        }
-
-        .dropzone .hint {
-            display: inline-block;
-            margin-top: 14px;
-            font-size: 0.78rem;
-            color: var(--muted);
-            background: rgba(255, 255, 255, .05);
-            border-radius: 8px;
-            padding: 5px 14px;
         }
 
         #selected-name {
@@ -399,60 +431,12 @@
             padding: 14px 18px;
             color: var(--danger);
             font-size: 0.88rem;
-            display: none;
             align-items: center;
             gap: 10px;
         }
 
         #error-box.visible {
             display: flex;
-        }
-
-        /* ── Steps ── */
-        .steps {
-            display: flex;
-            justify-content: center;
-            gap: 0;
-        }
-
-        .step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            flex: 1;
-            max-width: 160px;
-            position: relative;
-        }
-
-        .step:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            width: 100%;
-            height: 2px;
-            background: var(--border);
-        }
-
-        .step-bubble {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--card);
-            border: 2px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .step p {
-            font-size: 0.75rem;
-            color: var(--muted);
-            text-align: center;
         }
     </style>
 </head>
@@ -461,51 +445,47 @@
 
     <header>
         <div class="logo-icon">⚡</div>
-        <h1>LibreOffice → Office Converter</h1>
-        <span>Free · Secure · Fast</span>
+        <h1>Universal File Converter</h1>
+        <span>Documents · Images · Media · Data</span>
     </header>
 
     <main>
 
         <!-- Hero -->
         <div class="hero">
-            <h2>Convert LibreOffice Files<br>to Microsoft Office</h2>
-            <p>Upload an ODT, ODS, or ODP file and get back a DOCX, XLSX, or PPTX instantly.</p>
+            <h2>Convert Any File Format</h2>
+            <p>Fast, secure, and completely free format conversion.</p>
         </div>
 
-        <!-- Format badges -->
-        <div class="badges">
-            <div class="badge"><span class="from">ODT</span><span class="arrow">→</span><span class="to">DOCX</span>
-            </div>
-            <div class="badge"><span class="from">ODS</span><span class="arrow">→</span><span class="to">XLSX</span>
-            </div>
-            <div class="badge"><span class="from">ODP</span><span class="arrow">→</span><span class="to">PPTX</span>
-            </div>
+        <!-- Category Tabs -->
+        <div class="tabs" id="category-tabs">
+            <div class="tab active" data-cat="doc">📄 Documents</div>
+            <div class="tab" data-cat="img">🖼️ Images</div>
+            <div class="tab" data-cat="aud">🎵 Audio</div>
+            <div class="tab" data-cat="vid">🎬 Video</div>
+            <div class="tab" data-cat="dat">📊 Data</div>
+            <div class="tab" data-cat="arc">📦 Archives</div>
         </div>
 
-        <!-- How it works -->
-        <div class="steps">
-            <div class="step">
-                <div class="step-bubble">📂</div>
-                <p>Upload your<br>LibreOffice file</p>
+        <!-- Format Selectors -->
+        <div class="format-selectors">
+            <div class="select-wrap">
+                <label>Convert from</label>
+                <select id="sel-from"></select>
             </div>
-            <div class="step">
-                <div class="step-bubble">⚙️</div>
-                <p>We convert it<br>instantly</p>
-            </div>
-            <div class="step">
-                <div class="step-bubble">📥</div>
-                <p>Download the<br>Office file</p>
+            <div class="arrow-icon">→</div>
+            <div class="select-wrap">
+                <label>Convert to</label>
+                <select id="sel-to"></select>
             </div>
         </div>
 
         <!-- Drop zone -->
         <div class="dropzone" id="dropzone">
-            <input type="file" id="file-input" name="file" accept=".odt,.ods,.odp" />
-            <div class="dz-icon">📄</div>
-            <h3>Drop your file here, or click to browse</h3>
-            <p>Supports ODT, ODS, ODP files</p>
-            <span class="hint">Max file size: 10 MB</span>
+            <input type="file" id="file-input" name="file" />
+            <div class="dz-icon" id="dz-icon">📄</div>
+            <h3 id="dz-title">Drop your file here, or click to browse</h3>
+            <p id="dz-desc">Supports PDF, DOCX, ODT and more.</p>
             <div id="selected-name"></div>
         </div>
 
@@ -551,8 +531,161 @@
     </main>
 
     <script>
-        const dropzone = document.getElementById('dropzone');
+        // Complete mapping logic for frontend
+        const FORMAT_MAP = {
+            doc: {
+                icon: '📄',
+                desc: 'Supports DOCX, PDF, ODT, HTML, MD, TXT...',
+                map: {
+                    docx: ['pdf', 'odt', 'txt', 'html', 'rtf', 'md'],
+                    odt: ['docx', 'pdf', 'txt', 'html', 'rtf'],
+                    pdf: ['docx', 'txt', 'html'],
+                    rtf: ['docx', 'pdf', 'odt', 'txt'],
+                    txt: ['docx', 'pdf', 'html', 'md'],
+                    md: ['html', 'pdf', 'docx'],
+                    html: ['pdf', 'docx', 'md', 'txt'],
+                    pptx: ['pdf', 'html', 'odp'],
+                    odp: ['pptx', 'pdf']
+                }
+            },
+            img: {
+                icon: '🖼️',
+                desc: 'Supports PNG, JPG, WEBP, SVG, TIFF...',
+                map: {
+                    png: ['jpg', 'webp', 'bmp', 'gif', 'svg', 'ico', 'tiff'],
+                    jpg: ['png', 'webp', 'bmp', 'gif', 'tiff', 'ico'],
+                    jpeg: ['png', 'webp', 'bmp', 'gif', 'tiff', 'ico'],
+                    svg: ['png', 'jpg', 'pdf'],
+                    webp: ['png', 'jpg', 'gif'],
+                    heic: ['jpg', 'png'],
+                    bmp: ['png', 'jpg', 'webp'],
+                    tiff: ['png', 'jpg', 'pdf']
+                }
+            },
+            aud: {
+                icon: '🎵',
+                desc: 'Supports MP3, WAV, FLAC, OGG, AAC...',
+                map: {
+                    mp3: ['wav', 'ogg', 'flac', 'aac', 'm4a'],
+                    wav: ['mp3', 'ogg', 'flac', 'aac'],
+                    flac: ['mp3', 'wav', 'ogg', 'aac'],
+                    ogg: ['mp3', 'wav', 'flac'],
+                    aac: ['mp3', 'wav', 'ogg'],
+                    m4a: ['mp3', 'wav', 'ogg']
+                }
+            },
+            vid: {
+                icon: '🎬',
+                desc: 'Supports MP4, AVI, MKV, WEBM, MOV...',
+                map: {
+                    mp4: ['avi', 'mkv', 'mov', 'webm', 'gif', 'mp3', 'wav'],
+                    avi: ['mp4', 'mkv', 'mov', 'webm'],
+                    mkv: ['mp4', 'avi', 'mov'],
+                    mov: ['mp4', 'avi', 'mkv'],
+                    webm: ['mp4', 'gif']
+                }
+            },
+            dat: {
+                icon: '📊',
+                desc: 'Supports CSV, JSON, XLSX, XML, YAML...',
+                map: {
+                    xlsx: ['csv', 'ods', 'pdf', 'json', 'html'],
+                    ods: ['xlsx', 'csv', 'pdf'],
+                    csv: ['xlsx', 'json', 'xml', 'yaml', 'ods', 'pdf'],
+                    json: ['csv', 'xml', 'yaml', 'xlsx'],
+                    xml: ['json', 'csv', 'yaml'],
+                    yaml: ['json', 'xml', 'csv'],
+                    yml: ['json', 'xml', 'csv']
+                }
+            },
+            arc: {
+                icon: '📦',
+                desc: 'Supports ZIP, RAR, 7Z, TAR.GZ...',
+                map: {
+                    zip: ['tar', 'tar.gz', '7z'],
+                    rar: ['zip', 'tar.gz', '7z'],
+                    '7z': ['zip', 'tar.gz'],
+                    'tar.gz': ['zip', '7z'],
+                    tgz: ['zip', '7z'],
+                    tar: ['zip', '7z', 'tar.gz']
+                }
+            }
+        };
+
+        const tabs = document.querySelectorAll('.tab');
+        const selFrom = document.getElementById('sel-from');
+        const selTo = document.getElementById('sel-to');
         const fileInput = document.getElementById('file-input');
+        const dzIcon = document.getElementById('dz-icon');
+        const dzDesc = document.getElementById('dz-desc');
+
+        let currentCategory = 'doc';
+
+        // Make ext keys unique
+        function populateSelect(selectEl, options, selectedVal = null) {
+            selectEl.innerHTML = '';
+            options.forEach(opt => {
+                const el = document.createElement('option');
+                el.value = opt;
+                el.textContent = opt.toUpperCase();
+                selectEl.appendChild(el);
+            });
+            if (selectedVal && options.includes(selectedVal)) {
+                selectEl.value = selectedVal;
+            }
+        }
+
+        function updateCategory(cat) {
+            currentCategory = cat;
+            const catData = FORMAT_MAP[cat];
+
+            // Update UI hints
+            dzIcon.textContent = catData.icon;
+            dzDesc.textContent = catData.desc;
+
+            // Populate 'From' dropdown
+            const fromFormats = Object.keys(catData.map);
+            populateSelect(selFrom, fromFormats);
+
+            // Trigger 'To' dropdown update
+            updateToDropdown();
+
+            // Update accepted file extensions in file input
+            const acceptStr = fromFormats.map(ext => '.' + ext).join(',');
+            fileInput.accept = acceptStr;
+
+            // Reset current file selection
+            convertAnother.click();
+        }
+
+        function updateToDropdown() {
+            const fromVal = selFrom.value;
+            if (!fromVal) return;
+            const toFormats = FORMAT_MAP[currentCategory].map[fromVal];
+            populateSelect(selTo, toFormats);
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                updateCategory(tab.dataset.cat);
+            });
+        });
+
+        selFrom.addEventListener('change', () => {
+            updateToDropdown();
+            // Re-run file validation if a file is uploaded
+            if (selectedFile) handleFile(selectedFile);
+        });
+
+        // Init
+        updateCategory('doc');
+
+        /* --------------------------------------------------------
+         *  Rest of Logic (Unchanged but adapted) 
+         * -------------------------------------------------------- */
+        const dropzone = document.getElementById('dropzone');
         const selectedName = document.getElementById('selected-name');
         const convertBtn = document.getElementById('convert-btn');
         const progressWrap = document.getElementById('progress-wrap');
@@ -571,27 +704,41 @@
 
         let selectedFile = null;
 
-        // ── Drag & Drop ──────────────────────────────────────────
         dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
         dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
         dropzone.addEventListener('drop', e => {
             e.preventDefault();
             dropzone.classList.remove('drag-over');
-            const files = e.dataTransfer.files;
-            if (files.length) handleFile(files[0]);
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
         });
-
         fileInput.addEventListener('change', () => {
             if (fileInput.files.length) handleFile(fileInput.files[0]);
         });
 
         function handleFile(file) {
-            const allowed = ['.odt', '.ods', '.odp'];
-            const ext = '.' + file.name.split('.').pop().toLowerCase();
-            if (!allowed.includes(ext)) {
-                showError(`"${file.name}" is not supported. Please upload an ODT, ODS, or ODP file.`);
+            let extMatch = false;
+            let fileExt = file.name.split('.').pop().toLowerCase();
+
+            // Quick handle for compound extensions like tar.gz
+            const nameLower = file.name.toLowerCase();
+            if (nameLower.endsWith('.tar.gz')) fileExt = 'tar.gz';
+
+            // Auto-switch 'From' dropdown if the extension matches a valid source
+            const fromFormats = Object.keys(FORMAT_MAP[currentCategory].map);
+            if (fromFormats.includes(fileExt)) {
+                selFrom.value = fileExt;
+                updateToDropdown();
+                extMatch = true;
+            }
+
+            if (!extMatch) {
+                showError(`"${file.name}" is not a valid input format for the current category. Please try a different tab or file.`);
+                selectedFile = null;
+                selectedName.style.display = 'none';
+                convertBtn.style.display = 'none';
                 return;
             }
+
             selectedFile = file;
             selectedName.textContent = '📎 ' + file.name;
             selectedName.style.display = 'block';
@@ -600,20 +747,17 @@
             resultCard.style.display = 'none';
         }
 
-        // ── Convert ───────────────────────────────────────────────
         convertBtn.addEventListener('click', () => {
             if (!selectedFile) return;
             startConversion();
         });
 
         function startConversion() {
-            // UI
             convertBtn.disabled = true;
             progressWrap.style.display = 'flex';
             hideError();
             resultCard.style.display = 'none';
 
-            // Animate progress indeterminate-style
             let fake = 0;
             const ticker = setInterval(() => {
                 fake = Math.min(fake + Math.random() * 8, 88);
@@ -622,6 +766,7 @@
 
             const formData = new FormData();
             formData.append('file', selectedFile);
+            formData.append('target_format', selTo.value);
             formData.append('csrfmiddlewaretoken', getCookie('csrftoken'));
 
             fetch('/convert/', {
@@ -629,7 +774,13 @@
                 body: formData,
             })
                 .then(async res => {
-                    const data = await res.json();
+                    let data;
+                    try {
+                        data = await res.json();
+                    } catch (e) {
+                        throw new Error('Server returned invalid response');
+                    }
+
                     clearInterval(ticker);
                     setProgress(100, 'Done!');
 
@@ -644,9 +795,9 @@
 
                     showResult(data);
                 })
-                .catch(() => {
+                .catch((err) => {
                     clearInterval(ticker);
-                    showError('Network error. Please check your connection and try again.');
+                    showError(err.message || 'Network error. Please check your connection and try again.');
                     resetConvertBtn();
                     progressWrap.style.display = 'none';
                 });
@@ -666,10 +817,7 @@
             resultCard.style.display = 'block';
             resetConvertBtn();
 
-            // Auto-download after a short delay
-            setTimeout(() => {
-                triggerDownload(url, data.original_name);
-            }, 800);
+            setTimeout(() => { triggerDownload(url, data.original_name); }, 800);
         }
 
         function triggerDownload(url, filename) {
@@ -681,7 +829,6 @@
             document.body.removeChild(a);
         }
 
-        // ── Convert Another ───────────────────────────────────────
         convertAnother.addEventListener('click', () => {
             selectedFile = null;
             fileInput.value = '';
@@ -691,31 +838,25 @@
             hideError();
         });
 
-        // ── Helpers ───────────────────────────────────────────────
         function setProgress(pct, label) {
             progressBar.style.width = pct + '%';
             progressPct.textContent = Math.round(pct) + '%';
             if (label) progressLabel.textContent = label;
         }
-
         function showError(msg) {
             errorText.textContent = msg;
             errorBox.classList.add('visible');
         }
-
         function hideError() {
             errorBox.classList.remove('visible');
         }
-
         function resetConvertBtn() {
             convertBtn.disabled = false;
             progressWrap.style.display = 'none';
             setProgress(0);
             progressLabel.textContent = 'Converting…';
         }
-
         function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
         function getCookie(name) {
             const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
             return match ? decodeURIComponent(match[1]) : '';
